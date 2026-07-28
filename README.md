@@ -32,7 +32,8 @@ python web_main.py
 在 Codespaces 中打开终端，创建 `.env`：
 
 ```bash
-cp .env.example .env
+git pull origin main          # 若提示找不到 .env.example，先拉取最新代码
+bash scripts/setup_env.sh     # 或: cp .env.example .env
 ```
 
 或在仓库 **Settings → Secrets and variables → Codespaces** 中添加：
