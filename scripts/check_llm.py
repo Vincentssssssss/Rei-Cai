@@ -2,7 +2,7 @@
 """Test LLM API connectivity and SSL configuration."""
 
 from src.config import get_llm_settings, get_llm_status
-from src.http_client import configure_ssl, create_http_session, get_ssl_verify
+from src.http_client import configure_ssl, create_http_session, get_ssl_backend, get_ssl_verify
 
 
 def main() -> None:
@@ -11,10 +11,10 @@ def main() -> None:
     status = get_llm_status()
 
     print("=== Rei-Cai LLM 诊断 ===")
-    print(f"SSL 证书: {get_ssl_verify()}")
+    print(f"SSL 模式: {get_ssl_backend()}")
+    print(f"SSL 验证: {get_ssl_verify()}")
     print(f"模型: {status['model']}")
     print(f"API Key: {'已设置' if status['api_key_set'] else '未设置'}")
-    print(f"业务空间: {status.get('workspace_id') or '未设置'}")
     print(f"Base URL: {status['base_url']}")
     if status.get("hint"):
         print(f"提示: {status['hint']}")
@@ -49,10 +49,10 @@ def main() -> None:
     except Exception as exc:
         print(f"\n连接失败: {exc.__class__.__name__}: {exc}")
         print("\n建议：")
-        print("1. pip install certifi")
-        print("2. 确认 OPENAI_BASE_URL 与 API Key 正确")
+        print("1. pip install -r requirements.txt   # 含 truststore")
+        print("2. 确认 .env 中 OPENAI_BASE_URL 为百炼 llm- 开头地址")
         print("3. 关闭 VPN/代理后重试")
-        print("4. 在百炼控制台确认 API Key 有效：https://bailian.console.aliyun.com/")
+        print("4. 仍失败可临时测试：LLM_INSECURE_SSL=1 python3 scripts/check_llm.py")
 
 
 if __name__ == "__main__":

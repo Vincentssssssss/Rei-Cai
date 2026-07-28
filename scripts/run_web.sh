@@ -15,9 +15,7 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 
-# macOS: 修复 Python SSL 证书问题
-export SSL_CERT_FILE="$(python3 -c 'import certifi; print(certifi.where())')"
-export REQUESTS_CA_BUNDLE="$SSL_CERT_FILE"
+# macOS: 使用系统证书库（truststore）
 
 if [ ! -f .env ] && [ -f .env.example ]; then
   cp .env.example .env
