@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""Test LLM API connectivity and SSL configuration."""
-
-import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+"""Test LLM API connectivity. Run from project root: python3 check_llm.py"""
 
 from src.config import get_llm_settings, get_llm_status
 from src.http_client import configure_ssl, create_http_session, get_ssl_backend, get_ssl_verify
@@ -56,7 +49,7 @@ def main() -> None:
     except Exception as exc:
         print(f"\n连接失败: {exc.__class__.__name__}: {exc}")
         print("\n建议：")
-        print("1. pip install -r requirements.txt   # 含 truststore")
+        print("1. pip install -r requirements.txt")
         print("2. 确认 .env 中 OPENAI_BASE_URL 为百炼 llm- 开头地址")
         print("3. 关闭 VPN/代理后重试")
         print("4. 仍失败可临时测试：LLM_INSECURE_SSL=1 python3 check_llm.py")

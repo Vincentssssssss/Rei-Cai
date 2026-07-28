@@ -92,7 +92,7 @@ source .venv/bin/activate
 git pull origin main
 pip install -r requirements.txt   # 含 truststore，自动使用 macOS 系统证书
 
-python3 scripts/check_llm.py
+python3 check_llm.py
 python3 web_main.py
 ```
 

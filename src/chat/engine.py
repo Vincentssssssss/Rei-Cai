@@ -68,7 +68,7 @@ class ChatEngine:
         if "CERTIFICATE_VERIFY_FAILED" in error_text:
             messages.append(
                 "macOS SSL 证书问题。请执行："
-                " pip install -r requirements.txt && python3 scripts/check_llm.py"
+                " pip install -r requirements.txt && python3 check_llm.py"
                 " （会自动使用 truststore 读取系统证书）"
             )
         elif "UNEXPECTED_EOF_WHILE_READING" in error_text or "SSLEOFError" in error_text:
