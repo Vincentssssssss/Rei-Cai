@@ -9,7 +9,6 @@
     }
   },
   "postCreateCommand": "pip install -r requirements.txt",
-  "postStartCommand": "python web_main.py",
   "customizations": {
     "vscode": {
       "extensions": ["ms-python.python"]
