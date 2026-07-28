@@ -68,6 +68,14 @@ class HomeFrame(ctk.CTkFrame):
             font=FONT_SMALL,
             text_color=COLORS["muted"],
         ).pack(pady=(8, 0))
+        if llm.get("hint"):
+            ctk.CTkLabel(
+                container,
+                text=llm["hint"],
+                font=FONT_SMALL,
+                text_color="#b45309",
+                wraplength=520,
+            ).pack(pady=(4, 0))
 
 
 class App(ctk.CTk):

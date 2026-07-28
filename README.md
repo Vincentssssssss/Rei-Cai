@@ -39,7 +39,7 @@ bash scripts/setup_env.sh     # 或: cp .env.example .env
 或在仓库 **Settings → Secrets and variables → Codespaces** 中添加：
 
 - `OPENAI_API_KEY`
-- `OPENAI_BASE_URL` = `https://api.openai.com/v1`
+- `OPENAI_BASE_URL` = `https://dashscope.aliyuncs.com/compatible-mode/v1`
 - `OPENAI_MODEL` = `openai/qwen-plus`
 
 ## 本地 macOS 运行（Homebrew）
@@ -119,13 +119,14 @@ python web_main.py   # Codespaces
 或直接设置环境变量：
 
 ```bash
-export OPENAI_API_KEY="your-api-key"
-export OPENAI_BASE_URL="https://api.openai.com/v1"
+# 阿里云 Qwen（国内推荐）
+export OPENAI_API_KEY="your-dashscope-api-key"
+export OPENAI_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
 export OPENAI_MODEL="openai/qwen-plus"
 python web_main.py
 ```
 
-`OPENAI_MODEL` 中的 `openai/` 前缀会自动去除。
+`OPENAI_MODEL` 中的 `openai/` 前缀会自动去除。使用 qwen 模型时**不要**填 `api.openai.com`，否则国内容易出现 SSL 连接失败。
 
 未配置 API Key 时，系统会基于资料检索直接整理相关片段作为回答。首页和管理端会显示当前大模型配置状态。
 
