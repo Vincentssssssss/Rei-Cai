@@ -47,7 +47,7 @@ class ChatEngine:
             )
         elif not self.base_url:
             lines.append(
-                "已配置 API Key，但缺少百炼业务空间 ID。请设置 BAILIAN_WORKSPACE_ID。"
+                "已配置 API Key，但缺少百炼 API 地址。请设置 OPENAI_BASE_URL。"
             )
         return "\n".join(lines)
 

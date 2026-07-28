@@ -39,8 +39,7 @@ bash scripts/setup_env.sh     # 或: cp .env.example .env
 或在仓库 **Settings → Secrets and variables → Codespaces** 中添加：
 
 - `OPENAI_API_KEY`
-- `BAILIAN_WORKSPACE_ID`
-- `BAILIAN_REGION` = `cn-beijing`（可选）
+- `OPENAI_BASE_URL` = `https://llm-xxxxx.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`
 - `OPENAI_MODEL` = `openai/qwen-plus`
 
 ## 本地 macOS 运行（Homebrew）
@@ -133,7 +132,7 @@ python web_main.py      # 或 Web 版本（浏览器访问 http://localhost:8000
 > DashScope（灵积）控制台已下线，请使用 **大模型服务平台百炼**：https://bailian.console.aliyun.com/
 
 1. 在百炼控制台创建 API Key
-2. 在「业务空间」页面复制 **Workspace ID（业务空间 ID）**
+2. 在百炼控制台复制 **OpenAI 兼容 Base URL**（格式如 `https://llm-xxxxx.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`）
 3. 配置 `.env`：
 
 ```bash
@@ -142,8 +141,7 @@ cp .env.example .env
 
 ```bash
 OPENAI_API_KEY=你的百炼API密钥
-BAILIAN_WORKSPACE_ID=你的业务空间ID
-BAILIAN_REGION=cn-beijing
+OPENAI_BASE_URL=https://llm-xxxxx.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
 OPENAI_MODEL=openai/qwen-plus
 ```
 
@@ -151,13 +149,12 @@ OPENAI_MODEL=openai/qwen-plus
 
 ```bash
 export OPENAI_API_KEY="你的百炼API密钥"
-export BAILIAN_WORKSPACE_ID="你的业务空间ID"
+export OPENAI_BASE_URL="https://llm-xxxxx.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
 export OPENAI_MODEL="openai/qwen-plus"
 python3 web_main.py
 ```
 
-程序会自动生成百炼 API 地址：
-`https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`
+> 注意：`BAILIAN_WORKSPACE_ID` 需为 `llm-` 开头的地址前缀，**不是**控制台里的纯数字 ID。推荐直接填写完整的 `OPENAI_BASE_URL`。
 
 `OPENAI_MODEL` 中的 `openai/` 前缀会自动去除。
 

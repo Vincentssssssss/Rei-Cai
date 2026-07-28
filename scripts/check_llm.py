@@ -50,7 +50,7 @@ def main() -> None:
         print(f"\n连接失败: {exc.__class__.__name__}: {exc}")
         print("\n建议：")
         print("1. pip install certifi")
-        print("2. 确认 BAILIAN_WORKSPACE_ID 和 API Key 正确")
+        print("2. 确认 OPENAI_BASE_URL 与 API Key 正确")
         print("3. 关闭 VPN/代理后重试")
         print("4. 在百炼控制台确认 API Key 有效：https://bailian.console.aliyun.com/")
 
