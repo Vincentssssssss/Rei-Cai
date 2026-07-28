@@ -2,6 +2,7 @@ import threading
 
 import customtkinter as ctk
 
+from src.chat.citations import build_citations
 from src.chat.engine import ChatEngine
 from src.gui.styles import COLORS, FONT_BODY, FONT_SMALL, FONT_SUBTITLE, FONT_TITLE
 from src.knowledge.store import KnowledgeStore
@@ -49,7 +50,7 @@ class ChatFrame(ctk.CTkFrame):
             text_color=COLORS["muted"],
         ).pack(anchor="e", padx=24, pady=(0, 8))
 
-    def _append_message(self, role: str, text: str) -> None:
+    def _append_message(self, role: str, text: str, citations: list[dict] | None = None) -> None:
         bubble_color = COLORS["user_bubble"] if role == "user" else COLORS["bot_bubble"]
         align = "e" if role == "user" else "w"
         anchor = "e" if role == "user" else "w"
@@ -73,11 +74,30 @@ class ChatFrame(ctk.CTkFrame):
             anchor="w",
         ).pack(padx=14, pady=12, anchor="w")
 
+        if role == "bot" and citations:
+            cite_frame = ctk.CTkFrame(wrapper, fg_color="#f9fafb", corner_radius=12, border_width=1, border_color=COLORS["border"])
+            cite_frame.pack(anchor="w", fill="x", pady=(4, 0))
+            ctk.CTkLabel(cite_frame, text="引用", font=FONT_SMALL, text_color=COLORS["muted"]).pack(anchor="w", padx=12, pady=(10, 4))
+            for index, item in enumerate(citations, start=1):
+                excerpt = item["excerpt"]
+                if len(excerpt) > 220:
+                    excerpt = excerpt[:220].rstrip() + "..."
+                cite_text = f"[{index}] {item['source']}\n{excerpt}"
+                ctk.CTkLabel(
+                    cite_frame,
+                    text=cite_text,
+                    font=FONT_SMALL,
+                    text_color=COLORS["text"],
+                    justify="left",
+                    wraplength=740,
+                    anchor="w",
+                ).pack(anchor="w", padx=12, pady=(0, 10))
+
         self.update_idletasks()
         self.chat_area._parent_canvas.yview_moveto(1.0)
 
-    def _append_bot(self, text: str) -> None:
-        self._append_message("bot", text)
+    def _append_bot(self, text: str, citations: list[dict] | None = None) -> None:
+        self._append_message("bot", text, citations)
 
     def _append_user(self, text: str) -> None:
         self._append_message("user", text)
@@ -98,16 +118,13 @@ class ChatFrame(ctk.CTkFrame):
 
         def task() -> None:
             answer, hits = self.engine.answer(question)
-            sources = ", ".join(sorted({hit["source"] for hit in hits})) if hits else "无"
-            full_answer = answer
-            if hits:
-                full_answer += f"\n\n参考来源：{sources}"
+            citations = build_citations(hits)
 
             def done() -> None:
                 children = self.chat_area.winfo_children()
                 if children:
                     children[-1].destroy()
-                self._append_bot(full_answer)
+                self._append_bot(answer, citations)
                 self.send_button.configure(state="normal", text="发送")
 
             self.after(0, done)

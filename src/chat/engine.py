@@ -1,5 +1,6 @@
 import requests
 
+from src.chat.citations import build_citations
 from src.config import get_llm_settings
 from src.knowledge.store import KnowledgeStore
 
@@ -24,18 +25,22 @@ class ChatEngine:
             try:
                 return self._answer_with_llm(question, hits), hits
             except Exception as exc:
-                return self._answer_with_retrieval(question, hits) + f"\n\n（LLM 调用失败，已改用资料检索：{exc}）", hits
+                return (
+                    self._answer_with_retrieval(question, hits)
+                    + f"\n\n（LLM 调用失败，已改用资料检索：{exc}）",
+                    hits,
+                )
 
         return self._answer_with_retrieval(question, hits), hits
 
     def _answer_with_retrieval(self, question: str, hits: list[dict]) -> str:
-        lines = ["根据已学习的资料，整理如下：", ""]
-        for index, hit in enumerate(hits, start=1):
-            lines.append(f"{index}. 来源：{hit['source']}")
-            lines.append(hit["text"])
-            lines.append("")
+        top = hits[0]["text"].strip()
+        if len(top) > 320:
+            top = top[:320].rstrip() + "..."
+        lines = [f"根据已学习的资料：{top}", ""]
+        lines.append("详细引用请见下方「引用」区域。")
         lines.append(
-            "如需更精确的答案，请配置环境变量：OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL。"
+            "如需更自然的回答，请配置环境变量：OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL。"
         )
         return "\n".join(lines)
 
@@ -53,6 +58,7 @@ class ChatEngine:
                     "content": (
                         "你是基于用户资料回答问题的助手。只根据提供的资料作答，"
                         "资料中没有的信息请明确说明不知道，不要编造。"
+                        "回答时在相关语句后标注引用来源，使用 [文件名] 格式。"
                     ),
                 },
                 {

@@ -3,6 +3,7 @@ from pathlib import Path
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
+from src.chat.citations import build_citations
 from src.chat.engine import ChatEngine
 from src.config import KNOWLEDGE_DIR, SUPPORTED_EXTENSIONS, get_llm_status
 from src.knowledge.store import KnowledgeStore
@@ -73,7 +74,6 @@ def create_app() -> Flask:
             return jsonify({"error": "问题不能为空"}), 400
 
         answer, hits = engine.answer(question)
-        sources = sorted({hit["source"] for hit in hits})
-        return jsonify({"answer": answer, "sources": sources})
+        return jsonify({"answer": answer, "citations": build_citations(hits)})
 
     return app

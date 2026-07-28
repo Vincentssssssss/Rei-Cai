@@ -205,6 +205,49 @@ h1 {
   background: var(--user-bubble);
 }
 
+.citations {
+  margin-top: 10px;
+  max-width: 85%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px solid var(--border);
+}
+
+.citations-title {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.citation-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.citation-item {
+  margin-bottom: 10px;
+}
+
+.citation-item:last-child {
+  margin-bottom: 0;
+}
+
+.citation-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.citation-excerpt {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
 .chat-form {
   display: flex;
   gap: 12px;

@@ -29,14 +29,53 @@
   const messages = document.getElementById("messages");
   const sendBtn = document.getElementById("send-btn");
 
-  function appendMessage(role, text) {
+  function appendMessage(role, text, citations = []) {
     const wrap = document.createElement("div");
     wrap.className = `message ${role}`;
-    wrap.innerHTML = `
-      <span class="label">${role === "user" ? "你" : "Rei-Cai"}</span>
-      <div class="bubble"></div>
-    `;
-    wrap.querySelector(".bubble").textContent = text;
+
+    const label = document.createElement("span");
+    label.className = "label";
+    label.textContent = role === "user" ? "你" : "Rei-Cai";
+    wrap.appendChild(label);
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = text;
+    wrap.appendChild(bubble);
+
+    if (role === "bot" && citations.length) {
+      const block = document.createElement("div");
+      block.className = "citations";
+
+      const title = document.createElement("div");
+      title.className = "citations-title";
+      title.textContent = "引用";
+      block.appendChild(title);
+
+      const list = document.createElement("ol");
+      list.className = "citation-list";
+
+      citations.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.className = "citation-item";
+
+        const source = document.createElement("div");
+        source.className = "citation-title";
+        source.textContent = `[${index + 1}] ${item.source}`;
+        li.appendChild(source);
+
+        const excerpt = document.createElement("div");
+        excerpt.className = "citation-excerpt";
+        excerpt.textContent = item.excerpt;
+        li.appendChild(excerpt);
+
+        list.appendChild(li);
+      });
+
+      block.appendChild(list);
+      wrap.appendChild(block);
+    }
+
     messages.appendChild(wrap);
     messages.scrollTop = messages.scrollHeight;
   }
@@ -60,11 +99,7 @@
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "请求失败");
 
-      let answer = data.answer;
-      if (data.sources && data.sources.length) {
-        answer += `\n\n参考来源：${data.sources.join(", ")}`;
-      }
-      appendMessage("bot", answer);
+      appendMessage("bot", data.answer, data.citations || []);
     } catch (error) {
       appendMessage("bot", `出错了：${error.message}`);
     } finally {
