@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Rei-Cai - 管理入口{% endblock %}
+{% block content %}
+<section class="page">
+  <header class="page-header">
+    <a class="link-back" href="{{ url_for('home') }}">← 返回</a>
+    <h1>管理入口</h1>
+  </header>
+
+  <div class="card">
+    <div class="toolbar">
+      <h2>资料管理</h2>
+      <div class="toolbar-actions">
+        <form method="post" enctype="multipart/form-data" class="inline-form">
+          <input type="hidden" name="action" value="upload">
+          <input type="file" name="files" multiple accept=".txt,.md,.pdf">
+          <button type="submit" class="btn btn-primary">上传资料</button>
+        </form>
+        <form method="post" class="inline-form">
+          <input type="hidden" name="action" value="rebuild">
+          <button type="submit" class="btn btn-secondary">重建索引</button>
+        </form>
+      </div>
+    </div>
+
+    <p class="hint">支持 .txt / .md / .pdf，上传后点击「重建索引」即可供对话使用。</p>
+
+    {% if sources %}
+      <ul class="file-list">
+        {% for item in sources %}
+          <li class="file-item">
+            <div>
+              <strong>{{ item.name }}</strong>
+              <span class="meta">{{ item.size_kb }} KB · {{ item.chunks }} 片段</span>
+            </div>
+            <form method="post" onsubmit="return confirm('确定删除 {{ item.name }} 吗？')">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="filename" value="{{ item.name }}">
+              <button type="submit" class="btn btn-danger">删除</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty">暂无资料，请先上传文件。</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

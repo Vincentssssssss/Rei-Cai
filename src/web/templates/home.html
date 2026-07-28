@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Rei-Cai - 首页{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Rei-Cai</h1>
+  <p class="subtitle">基于资料学习的智能对话机器人</p>
+
+  <div class="card actions">
+    <a class="btn btn-primary" href="{{ url_for('chat') }}">用户入口</a>
+    <a class="btn btn-secondary" href="{{ url_for('admin') }}">管理入口</a>
+  </div>
+
+  <p class="meta">当前资料：{{ file_count }} 个文件，{{ chunk_count }} 个知识片段</p>
+</section>
+{% endblock %}

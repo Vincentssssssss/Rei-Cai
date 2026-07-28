@@ -1,6 +1,6 @@
 # Rei-Cai
 
-基于资料学习的智能对话机器人，适用于 Linux 桌面环境。
+基于资料学习的智能对话机器人，支持 **Linux 桌面 GUI** 与 **GitHub Codespaces Web 展示**。
 
 ## 功能
 
@@ -10,22 +10,51 @@
 - **智能问答**：根据已上传资料检索相关内容并生成回答
 - **可选 LLM**：配置 `OPENAI_API_KEY` 后可调用 OpenAI 兼容 API 生成更自然的回答
 
-## 环境要求
+## 在 GitHub Codespaces 中展示（推荐）
+
+Codespaces 没有桌面环境，请使用 Web 版本：
+
+1. 打开仓库，点击 **Code → Codespaces → Create codespace**
+2. 等待环境创建完成（会自动安装依赖并启动 Web 服务）
+3. 在弹出的浏览器标签页访问 **8000 端口**，或点击 Ports 面板中的链接
+
+手动启动：
+
+```bash
+pip install -r requirements.txt
+python web_main.py
+```
+
+然后在 Codespaces 中打开转发的 `8000` 端口即可看到界面。
+
+### 配置 API Key（Codespaces）
+
+在 Codespaces 中打开终端，创建 `.env`：
+
+```bash
+cp .env.example .env
+```
+
+或在仓库 **Settings → Secrets and variables → Codespaces** 中添加：
+
+- `OPENAI_API_KEY`
+- `STRIX_LLM` = `openai/qwen-plus`
+- `OPENAI_BASE_URL` = `https://dashscope.aliyuncs.com/compatible-mode/v1`
+
+## 本地 Linux 桌面运行
+
+### 环境要求
 
 - Linux
 - Python 3.10+
 - Tk 图形库（Ubuntu/Debian：`sudo apt install python3-tk`）
 
-## 安装
+### 安装与运行
 
 ```bash
 pip install -r requirements.txt
-```
-
-## 运行
-
-```bash
-python main.py
+python main.py          # 桌面 GUI
+python web_main.py      # 或 Web 版本（浏览器访问 http://localhost:8000）
 ```
 
 ## 使用流程
@@ -42,7 +71,8 @@ python main.py
 ```bash
 cp .env.example .env
 # 编辑 .env 填入 OPENAI_API_KEY
-python main.py
+python web_main.py   # Codespaces
+# 或 python main.py  # 本地桌面
 ```
 
 或直接设置环境变量：
@@ -51,7 +81,7 @@ python main.py
 export OPENAI_API_KEY="your-api-key"
 export STRIX_LLM="openai/qwen-plus"
 export OPENAI_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
-python main.py
+python web_main.py
 ```
 
 也支持 `OPENAI_MODEL` 作为模型名环境变量。`STRIX_LLM` 中的 `openai/` 前缀会自动去除。
@@ -61,8 +91,10 @@ python main.py
 ## 项目结构
 
 ```
-├── main.py                 # 程序入口
+├── main.py                 # 桌面 GUI 入口
+├── web_main.py             # Web 入口（Codespaces）
 ├── requirements.txt
+├── .devcontainer/          # Codespaces 配置
 ├── data/
 │   ├── knowledge/          # 上传的资料文件
 │   └── index/              # 检索索引
@@ -70,5 +102,6 @@ python main.py
     ├── config.py
     ├── chat/engine.py      # 对话引擎
     ├── knowledge/          # 资料加载与索引
-    └── gui/                # 图形界面
+    ├── gui/                # 桌面图形界面
+    └── web/                # Web 界面
 ```

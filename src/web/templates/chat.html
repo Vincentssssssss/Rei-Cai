@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Rei-Cai - 用户入口{% endblock %}
+{% block content %}
+<section class="page chat-page">
+  <header class="page-header">
+    <a class="link-back" href="{{ url_for('home') }}">← 返回</a>
+    <h1>用户入口</h1>
+  </header>
+
+  <div class="card chat-card">
+    <div id="messages" class="messages">
+      <div class="message bot">
+        <span class="label">Rei-Cai</span>
+        <div class="bubble">你好，我是 Rei-Cai。请基于已上传的资料向我提问。</div>
+      </div>
+    </div>
+
+    <form id="chat-form" class="chat-form">
+      <textarea id="question" rows="3" placeholder="输入你的问题..." required></textarea>
+      <button type="submit" class="btn btn-primary" id="send-btn">发送</button>
+    </form>
+    <p class="hint">Ctrl + Enter 发送</p>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById("chat-form");
+  const questionInput = document.getElementById("question");
+  const messages = document.getElementById("messages");
+  const sendBtn = document.getElementById("send-btn");
+
+  function appendMessage(role, text) {
+    const wrap = document.createElement("div");
+    wrap.className = `message ${role}`;
+    wrap.innerHTML = `
+      <span class="label">${role === "user" ? "你" : "Rei-Cai"}</span>
+      <div class="bubble"></div>
+    `;
+    wrap.querySelector(".bubble").textContent = text;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    appendMessage("user", question);
+    questionInput.value = "";
+    sendBtn.disabled = true;
+    sendBtn.textContent = "思考中...";
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "请求失败");
+
+      let answer = data.answer;
+      if (data.sources && data.sources.length) {
+        answer += `\n\n参考来源：${data.sources.join(", ")}`;
+      }
+      appendMessage("bot", answer);
+    } catch (error) {
+      appendMessage("bot", `出错了：${error.message}`);
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.textContent = "发送";
+    }
+  });
+
+  questionInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && event.ctrlKey) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+</script>
+{% endblock %}
