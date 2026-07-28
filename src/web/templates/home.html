@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Rei-Cai - 首页{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Rei-Cai</h1>
+  <p class="subtitle">基于资料学习的智能对话机器人</p>
+
+  <div class="card actions">
+    <a class="btn btn-primary" href="{{ url_for('chat') }}">用户入口</a>
+    <a class="btn btn-secondary" href="{{ url_for('admin') }}">管理入口</a>
+  </div>
+
+  <p class="meta">当前资料：{{ file_count }} 个文件，{{ chunk_count }} 个知识片段</p>
+
+  <div class="card llm-status">
+  {% if llm.configured %}
+    <p class="meta">大模型：已配置 · {{ llm.model }} · {{ llm.base_url }}</p>
+  {% else %}
+    <p class="meta">大模型：未配置（仅资料检索模式）</p>
+    <p class="hint">配置 OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL 后重启服务</p>
+  {% endif %}
+  </div>
+</section>
+{% endblock %}
