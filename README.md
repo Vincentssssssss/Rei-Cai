@@ -82,6 +82,20 @@ python3 main.py
 > 若 `pip install` 失败，可能是 Python 3.14 过新，可改用 3.12：
 > `brew install python@3.12 && python3.12 -m venv .venv`
 
+### macOS SSL 证书报错
+
+若出现 `CERTIFICATE_VERIFY_FAILED`，执行：
+
+```bash
+source .venv/bin/activate
+pip install certifi
+export SSL_CERT_FILE="$(python3 -c 'import certifi; print(certifi.where())')"
+export REQUESTS_CA_BUNDLE="$SSL_CERT_FILE"
+python3 web_main.py
+```
+
+或直接运行 `bash scripts/run_web.sh`（已自动设置证书）。
+
 ## 本地 Linux 桌面运行
 
 ### 环境要求

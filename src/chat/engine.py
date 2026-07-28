@@ -1,8 +1,8 @@
 import requests
 from requests.exceptions import RequestException
 
-from src.chat.citations import build_citations
 from src.config import DASHSCOPE_BASE_URL, get_llm_hint, get_llm_settings
+from src.http_client import get_ssl_verify
 from src.knowledge.store import KnowledgeStore
 
 
@@ -61,10 +61,17 @@ class ChatEngine:
             messages.append(config_hint)
 
         error_text = str(exc)
-        if "SSL" in error_text or "SSLError" in error_text:
+        if "CERTIFICATE_VERIFY_FAILED" in error_text:
             messages.append(
-                "SSL 连接失败，常见于国内网络访问 api.openai.com。"
-                f"若使用 qwen 模型，请将 OPENAI_BASE_URL 设为 {DASHSCOPE_BASE_URL}"
+                "macOS 常见 SSL 证书问题。请在项目目录执行："
+                " pip install certifi && git pull origin main 后重启服务。"
+                " 或手动执行："
+                " export SSL_CERT_FILE=$(python3 -c \"import certifi; print(certifi.where())\")"
+            )
+        elif "SSL" in error_text or "SSLError" in error_text:
+            messages.append(
+                "SSL 连接失败。若使用 qwen 模型，请确认 OPENAI_BASE_URL 为 "
+                f"{DASHSCOPE_BASE_URL}"
             )
         elif isinstance(exc, RequestException) and not config_hint:
             messages.append("请检查 OPENAI_BASE_URL 与 API Key 是否正确。")
@@ -103,6 +110,7 @@ class ChatEngine:
             },
             json=payload,
             timeout=60,
+            verify=get_ssl_verify(),
         )
         response.raise_for_status()
         data = response.json()
