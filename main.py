@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import src.http_client  # noqa: F401 - configure SSL before GUI startup
+
 from src.gui.app import App
 from src.gui.styles import configure_theme
 

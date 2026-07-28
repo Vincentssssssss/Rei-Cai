@@ -1,8 +1,8 @@
 import requests
 from requests.exceptions import RequestException
 
-from src.config import BAILIAN_REGION_HOSTS, build_bailian_base_url, get_llm_hint, get_llm_settings
-from src.http_client import get_ssl_verify
+from src.config import get_llm_hint, get_llm_settings
+from src.http_client import create_http_session
 from src.knowledge.store import KnowledgeStore
 
 
@@ -67,14 +67,16 @@ class ChatEngine:
         error_text = str(exc)
         if "CERTIFICATE_VERIFY_FAILED" in error_text:
             messages.append(
-                "macOS 常见 SSL 证书问题。请在项目目录执行："
-                " pip install certifi && git pull origin main 后重启服务。"
-                " 或手动执行："
-                " export SSL_CERT_FILE=$(python3 -c \"import certifi; print(certifi.where())\")"
+                "SSL 证书验证失败。请执行：pip install certifi && python3 scripts/check_llm.py"
+            )
+        elif "UNEXPECTED_EOF_WHILE_READING" in error_text or "SSLEOFError" in error_text:
+            messages.append(
+                "SSL 连接中断，常见于网络不稳定或代理/VPN 干扰。"
+                "请关闭代理后重试，或执行 python3 scripts/check_llm.py 诊断。"
             )
         elif "SSL" in error_text or "SSLError" in error_text:
             messages.append(
-                "SSL 连接失败。请确认已安装 certifi，并检查 OPENAI_BASE_URL 是否为百炼平台地址。"
+                "SSL 连接失败。请执行：pip install certifi && python3 scripts/check_llm.py"
             )
         elif isinstance(exc, RequestException) and not config_hint:
             messages.append("请检查 OPENAI_BASE_URL 与 API Key 是否正确。")
@@ -105,7 +107,8 @@ class ChatEngine:
             ],
             "temperature": 0.2,
         }
-        response = requests.post(
+        session = create_http_session()
+        response = session.post(
             f"{self.base_url}/chat/completions",
             headers={
                 "Authorization": f"Bearer {self.api_key}",
@@ -113,7 +116,6 @@ class ChatEngine:
             },
             json=payload,
             timeout=60,
-            verify=get_ssl_verify(),
         )
         response.raise_for_status()
         data = response.json()

@@ -85,17 +85,25 @@ python3 main.py
 
 ### macOS SSL 证书报错
 
-若出现 `CERTIFICATE_VERIFY_FAILED`，执行：
+若出现 `SSLError` 或 `CERTIFICATE_VERIFY_FAILED`：
 
 ```bash
+cd Rei-Cai
 source .venv/bin/activate
-pip install certifi
-export SSL_CERT_FILE="$(python3 -c 'import certifi; print(certifi.where())')"
-export REQUESTS_CA_BUNDLE="$SSL_CERT_FILE"
+git pull origin main
+pip install -r requirements.txt
+
+# 运行诊断脚本
+python3 scripts/check_llm.py
+```
+
+诊断通过后重启：
+
+```bash
 python3 web_main.py
 ```
 
-或直接运行 `bash scripts/run_web.sh`（已自动设置证书）。
+最新版本会在启动时自动配置 SSL 证书，一般无需手动 export 环境变量。
 
 ## 本地 Linux 桌面运行
 
