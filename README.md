@@ -42,6 +42,46 @@ bash scripts/setup_env.sh     # 或: cp .env.example .env
 - `OPENAI_BASE_URL` = `https://api.openai.com/v1`
 - `OPENAI_MODEL` = `openai/qwen-plus`
 
+## 本地 macOS 运行（Homebrew）
+
+macOS 上通常没有 `python` 命令，请使用 `python3`：
+
+```bash
+cd Rei-Cai
+
+# 1. 创建并激活虚拟环境（推荐）
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 2. 安装依赖
+pip install -r requirements.txt
+
+# 3. 配置 API Key（可选）
+cp .env.example .env
+# 编辑 .env 填入 OPENAI_API_KEY
+
+# 4. 启动 Web 版
+python3 web_main.py
+```
+
+浏览器打开 http://localhost:8000
+
+或使用一键脚本：
+
+```bash
+bash scripts/run_web.sh
+```
+
+桌面 GUI 还需安装 tkinter：
+
+```bash
+brew install python-tk@3.14
+python3 main.py
+```
+
+> 若 `pip install` 失败，可能是 Python 3.14 过新，可改用 3.12：
+> `brew install python@3.12 && python3.12 -m venv .venv`
+
 ## 本地 Linux 桌面运行
 
 ### 环境要求
