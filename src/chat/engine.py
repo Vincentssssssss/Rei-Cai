@@ -1,17 +1,16 @@
-import os
-
 import requests
 
-from src.config import LLM_API_KEY, LLM_BASE_URL, LLM_MODEL
+from src.config import get_llm_settings
 from src.knowledge.store import KnowledgeStore
 
 
 class ChatEngine:
     def __init__(self, store: KnowledgeStore) -> None:
         self.store = store
-        self.api_key = os.getenv("OPENAI_API_KEY", LLM_API_KEY)
-        self.base_url = os.getenv("OPENAI_BASE_URL", LLM_BASE_URL).rstrip("/")
-        self.model = os.getenv("OPENAI_MODEL", LLM_MODEL)
+        settings = get_llm_settings()
+        self.api_key = settings["api_key"]
+        self.base_url = settings["base_url"]
+        self.model = settings["model"]
 
     def answer(self, question: str) -> tuple[str, list[dict]]:
         hits = self.store.search(question)
