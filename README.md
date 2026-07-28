@@ -90,19 +90,17 @@ python3 main.py
 cd Rei-Cai
 source .venv/bin/activate
 git pull origin main
-pip install -r requirements.txt
+pip install -r requirements.txt   # 含 truststore，自动使用 macOS 系统证书
 
-# 运行诊断脚本
 python3 scripts/check_llm.py
-```
-
-诊断通过后重启：
-
-```bash
 python3 web_main.py
 ```
 
-最新版本会在启动时自动配置 SSL 证书，一般无需手动 export 环境变量。
+若仍失败，可临时跳过 SSL 验证做测试（不推荐长期使用）：
+
+```bash
+LLM_INSECURE_SSL=1 python3 web_main.py
+```
 
 ## 本地 Linux 桌面运行
 
