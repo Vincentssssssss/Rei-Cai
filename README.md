@@ -38,8 +38,8 @@ cp .env.example .env
 或在仓库 **Settings → Secrets and variables → Codespaces** 中添加：
 
 - `OPENAI_API_KEY`
-- `STRIX_LLM` = `openai/qwen-plus`
-- `OPENAI_BASE_URL` = `https://dashscope.aliyuncs.com/compatible-mode/v1`
+- `OPENAI_BASE_URL` = `https://api.openai.com/v1`
+- `OPENAI_MODEL` = `openai/qwen-plus`
 
 ## 本地 Linux 桌面运行
 
@@ -64,7 +64,7 @@ python web_main.py      # 或 Web 版本（浏览器访问 http://localhost:8000
 3. 点击「重建索引」，等待索引完成
 4. 返回首页，进入「用户入口」开始对话
 
-## 可选：接入大模型（阿里云 DashScope / Qwen）
+## 可选：接入大模型
 
 复制示例配置并填入你的 API Key：
 
@@ -79,12 +79,12 @@ python web_main.py   # Codespaces
 
 ```bash
 export OPENAI_API_KEY="your-api-key"
-export STRIX_LLM="openai/qwen-plus"
-export OPENAI_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
+export OPENAI_BASE_URL="https://api.openai.com/v1"
+export OPENAI_MODEL="openai/qwen-plus"
 python web_main.py
 ```
 
-也支持 `OPENAI_MODEL` 作为模型名环境变量。`STRIX_LLM` 中的 `openai/` 前缀会自动去除。
+`OPENAI_MODEL` 中的 `openai/` 前缀会自动去除。也兼容 `STRIX_LLM` 环境变量。
 
 未配置 API Key 时，系统会基于资料检索直接整理相关片段作为回答。
 
