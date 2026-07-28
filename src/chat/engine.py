@@ -1,7 +1,7 @@
 import requests
 from requests.exceptions import RequestException
 
-from src.config import DASHSCOPE_BASE_URL, get_llm_hint, get_llm_settings
+from src.config import BAILIAN_REGION_HOSTS, build_bailian_base_url, get_llm_hint, get_llm_settings
 from src.http_client import get_ssl_verify
 from src.knowledge.store import KnowledgeStore
 
@@ -22,7 +22,7 @@ class ChatEngine:
                 [],
             )
 
-        if self.api_key:
+        if self.api_key and self.base_url:
             try:
                 return self._answer_with_llm(question, hits), hits
             except Exception as exc:
@@ -43,7 +43,11 @@ class ChatEngine:
         lines.append("详细引用请见下方「引用」区域。")
         if not self.api_key:
             lines.append(
-                "如需更自然的回答，请配置环境变量：OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL。"
+                "如需更自然的回答，请配置 OPENAI_API_KEY 与 BAILIAN_WORKSPACE_ID。"
+            )
+        elif not self.base_url:
+            lines.append(
+                "已配置 API Key，但缺少百炼业务空间 ID。请设置 BAILIAN_WORKSPACE_ID。"
             )
         return "\n".join(lines)
 
@@ -70,8 +74,7 @@ class ChatEngine:
             )
         elif "SSL" in error_text or "SSLError" in error_text:
             messages.append(
-                "SSL 连接失败。若使用 qwen 模型，请确认 OPENAI_BASE_URL 为 "
-                f"{DASHSCOPE_BASE_URL}"
+                "SSL 连接失败。请确认已安装 certifi，并检查 OPENAI_BASE_URL 是否为百炼平台地址。"
             )
         elif isinstance(exc, RequestException) and not config_hint:
             messages.append("请检查 OPENAI_BASE_URL 与 API Key 是否正确。")
