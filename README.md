@@ -84,9 +84,9 @@ export OPENAI_MODEL="openai/qwen-plus"
 python web_main.py
 ```
 
-`OPENAI_MODEL` 中的 `openai/` 前缀会自动去除。也兼容 `STRIX_LLM` 环境变量。
+`OPENAI_MODEL` 中的 `openai/` 前缀会自动去除。
 
-未配置 API Key 时，系统会基于资料检索直接整理相关片段作为回答。
+未配置 API Key 时，系统会基于资料检索直接整理相关片段作为回答。首页和管理端会显示当前大模型配置状态。
 
 ## 项目结构
 

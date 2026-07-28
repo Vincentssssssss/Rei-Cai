@@ -25,6 +25,14 @@
 
     <p class="hint">支持 .txt / .md / .pdf，上传后点击「重建索引」即可供对话使用。</p>
 
+    <div class="llm-status">
+    {% if llm.configured %}
+      <p class="meta">大模型：已配置 · {{ llm.model }} · {{ llm.base_url }}</p>
+    {% else %}
+      <p class="meta">大模型：未配置 · 请在 .env 或环境变量中设置 OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL</p>
+    {% endif %}
+    </div>
+
     {% if sources %}
       <ul class="file-list">
         {% for item in sources %}

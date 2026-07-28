@@ -29,9 +29,18 @@ def _normalize_model_name(raw: str) -> str:
 def get_llm_settings() -> dict[str, str]:
     api_key = os.getenv("OPENAI_API_KEY", "")
     base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
-    model = os.getenv("OPENAI_MODEL") or os.getenv("STRIX_LLM", "gpt-4o-mini")
+    model = os.getenv("OPENAI_MODEL") or os.getenv("STRIX_LLM", "openai/qwen-plus")
     return {
         "api_key": api_key,
         "base_url": base_url,
         "model": _normalize_model_name(model),
+    }
+
+
+def get_llm_status() -> dict[str, str]:
+    settings = get_llm_settings()
+    return {
+        "configured": bool(settings["api_key"]),
+        "base_url": settings["base_url"],
+        "model": settings["model"],
     }

@@ -34,7 +34,9 @@ class ChatEngine:
             lines.append(f"{index}. 来源：{hit['source']}")
             lines.append(hit["text"])
             lines.append("")
-        lines.append("如需更精确的答案，可在环境变量中配置 OPENAI_API_KEY。")
+        lines.append(
+            "如需更精确的答案，请配置环境变量：OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL。"
+        )
         return "\n".join(lines)
 
     def _answer_with_llm(self, question: str, hits: list[dict]) -> str:

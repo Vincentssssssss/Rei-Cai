@@ -4,7 +4,7 @@ from flask import Flask, flash, jsonify, redirect, render_template, request, url
 from werkzeug.utils import secure_filename
 
 from src.chat.engine import ChatEngine
-from src.config import KNOWLEDGE_DIR, SUPPORTED_EXTENSIONS
+from src.config import KNOWLEDGE_DIR, SUPPORTED_EXTENSIONS, get_llm_status
 from src.knowledge.store import KnowledgeStore
 
 store = KnowledgeStore()
@@ -26,6 +26,7 @@ def create_app() -> Flask:
             "home.html",
             file_count=len(sources),
             chunk_count=len(store.documents),
+            llm=get_llm_status(),
         )
 
     @app.route("/admin", methods=["GET", "POST"])
@@ -58,7 +59,7 @@ def create_app() -> Flask:
 
             return redirect(url_for("admin"))
 
-        return render_template("admin.html", sources=store.list_sources())
+        return render_template("admin.html", sources=store.list_sources(), llm=get_llm_status())
 
     @app.get("/chat")
     def chat():

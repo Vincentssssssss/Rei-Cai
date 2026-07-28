@@ -233,6 +233,17 @@ h1 {
   margin-bottom: 8px;
 }
 
+.llm-status {
+  margin-top: 20px;
+  padding: 14px 18px;
+  text-align: center;
+}
+
+.llm-status .hint {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 640px) {
   .chat-form {
     flex-direction: column;

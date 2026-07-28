@@ -11,5 +11,14 @@
   </div>
 
   <p class="meta">当前资料：{{ file_count }} 个文件，{{ chunk_count }} 个知识片段</p>
+
+  <div class="card llm-status">
+  {% if llm.configured %}
+    <p class="meta">大模型：已配置 · {{ llm.model }} · {{ llm.base_url }}</p>
+  {% else %}
+    <p class="meta">大模型：未配置（仅资料检索模式）</p>
+    <p class="hint">配置 OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL 后重启服务</p>
+  {% endif %}
+  </div>
 </section>
 {% endblock %}

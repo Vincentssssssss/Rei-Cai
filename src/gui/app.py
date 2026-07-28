@@ -2,7 +2,8 @@ import customtkinter as ctk
 
 from src.gui.admin import AdminFrame
 from src.gui.chat import ChatFrame
-from src.gui.styles import COLORS, FONT_BODY, FONT_SUBTITLE, FONT_TITLE
+from src.gui.styles import COLORS, FONT_BODY, FONT_SMALL, FONT_SUBTITLE, FONT_TITLE
+from src.config import get_llm_status
 from src.knowledge.store import KnowledgeStore
 
 
@@ -49,12 +50,24 @@ class HomeFrame(ctk.CTkFrame):
         ).pack(padx=32, pady=(0, 28))
 
         stats = self.store.list_sources()
+        llm = get_llm_status()
         ctk.CTkLabel(
             container,
             text=f"当前资料：{len(stats)} 个文件，{len(self.store.documents)} 个知识片段",
             font=("Helvetica", 12),
             text_color=COLORS["muted"],
         ).pack(pady=(24, 0))
+
+        if llm["configured"]:
+            llm_text = f"大模型：已配置 · {llm['model']} · {llm['base_url']}"
+        else:
+            llm_text = "大模型：未配置（请设置 OPENAI_API_KEY 等环境变量）"
+        ctk.CTkLabel(
+            container,
+            text=llm_text,
+            font=FONT_SMALL,
+            text_color=COLORS["muted"],
+        ).pack(pady=(8, 0))
 
 
 class App(ctk.CTk):
