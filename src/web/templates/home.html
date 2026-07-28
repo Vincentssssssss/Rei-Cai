@@ -23,7 +23,7 @@
     {% endif %}
   {% else %}
     <p class="meta">大模型：未完整配置（仅资料检索模式）</p>
-    <p class="hint">请配置 OPENAI_API_KEY 与 BAILIAN_WORKSPACE_ID 后重启服务</p>
+    <p class="hint">请配置 OPENAI_API_KEY 与 OPENAI_BASE_URL 后重启服务</p>
     {% if llm.hint %}
       <p class="hint warning">{{ llm.hint }}</p>
     {% endif %}

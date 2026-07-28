@@ -106,8 +106,15 @@ def get_llm_hint(settings: dict[str, str] | None = None) -> str | None:
 
     if not base_url and not workspace_id:
         return (
-            "请在百炼控制台获取业务空间 ID，并在 .env 中设置 BAILIAN_WORKSPACE_ID。"
-            "控制台：https://bailian.console.aliyun.com/"
+            "请在百炼控制台复制 OpenAI 兼容 Base URL，设置 OPENAI_BASE_URL。"
+            "格式如：https://llm-xxxxx.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+        )
+
+    if workspace_id and workspace_id.isdigit():
+        return (
+            "BAILIAN_WORKSPACE_ID 不能是纯数字。请使用百炼控制台中的 llm- 开头地址，"
+            "直接设置 OPENAI_BASE_URL，例如："
+            "https://llm-xxxxx.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
         )
 
     if "{workspaceid}" in base_url:
