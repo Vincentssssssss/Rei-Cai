@@ -13,8 +13,8 @@ if [ -f .env.example ]; then
 fi
 
 cat > .env <<'EOF'
-OPENAI_API_KEY=your-api-key-here
-OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_API_KEY=your-dashscope-api-key
+OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 OPENAI_MODEL=openai/qwen-plus
 EOF
 

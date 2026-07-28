@@ -1,7 +1,8 @@
 import requests
+from requests.exceptions import RequestException
 
 from src.chat.citations import build_citations
-from src.config import get_llm_settings
+from src.config import DASHSCOPE_BASE_URL, get_llm_hint, get_llm_settings
 from src.knowledge.store import KnowledgeStore
 
 
@@ -25,9 +26,10 @@ class ChatEngine:
             try:
                 return self._answer_with_llm(question, hits), hits
             except Exception as exc:
+                hint = self._format_llm_error(exc)
                 return (
                     self._answer_with_retrieval(question, hits)
-                    + f"\n\n（LLM 调用失败，已改用资料检索：{exc}）",
+                    + f"\n\n（LLM 调用失败，已改用资料检索）\n{hint}",
                     hits,
                 )
 
@@ -39,10 +41,35 @@ class ChatEngine:
             top = top[:320].rstrip() + "..."
         lines = [f"根据已学习的资料：{top}", ""]
         lines.append("详细引用请见下方「引用」区域。")
-        lines.append(
-            "如需更自然的回答，请配置环境变量：OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL。"
-        )
+        if not self.api_key:
+            lines.append(
+                "如需更自然的回答，请配置环境变量：OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL。"
+            )
         return "\n".join(lines)
+
+    def _format_llm_error(self, exc: Exception) -> str:
+        messages = [f"原因：{exc.__class__.__name__}"]
+
+        config_hint = get_llm_hint(
+            {
+                "api_key": self.api_key,
+                "base_url": self.base_url,
+                "model": self.model,
+            }
+        )
+        if config_hint:
+            messages.append(config_hint)
+
+        error_text = str(exc)
+        if "SSL" in error_text or "SSLError" in error_text:
+            messages.append(
+                "SSL 连接失败，常见于国内网络访问 api.openai.com。"
+                f"若使用 qwen 模型，请将 OPENAI_BASE_URL 设为 {DASHSCOPE_BASE_URL}"
+            )
+        elif isinstance(exc, RequestException) and not config_hint:
+            messages.append("请检查 OPENAI_BASE_URL 与 API Key 是否正确。")
+
+        return "\n".join(messages)
 
     def _answer_with_llm(self, question: str, hits: list[dict]) -> str:
         context_blocks = []

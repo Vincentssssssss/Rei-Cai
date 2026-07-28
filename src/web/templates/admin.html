@@ -28,6 +28,9 @@
     <div class="llm-status">
     {% if llm.configured %}
       <p class="meta">大模型：已配置 · {{ llm.model }} · {{ llm.base_url }}</p>
+      {% if llm.hint %}
+        <p class="hint warning">{{ llm.hint }}</p>
+      {% endif %}
     {% else %}
       <p class="meta">大模型：未配置 · 请在 .env 或环境变量中设置 OPENAI_API_KEY、OPENAI_BASE_URL、OPENAI_MODEL</p>
     {% endif %}
