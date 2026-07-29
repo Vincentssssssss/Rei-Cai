@@ -1,6 +1,17 @@
 # Rei-Cai
 
-基于资料学习的智能对话机器人，支持 **Linux 桌面 GUI** 与 **GitHub Codespaces Web 展示**。
+基于资料学习的智能对话机器人。核心逻辑跨平台（Windows / macOS / Linux），**推荐用 Web 版**开发与测试，最终部署到 **Linux 服务器**。
+
+## 平台选择建议
+
+| 场景 | 推荐方式 | 说明 |
+|------|----------|------|
+| Windows 本地测试 | **Web 版** `web_main.py` | **不需要 Linux 虚拟机**，浏览器访问即可 |
+| macOS 本地测试 | Web 版 或 桌面 GUI | 同左 |
+| 演示 / 协作 | GitHub Codespaces | 浏览器访问 8000 端口 |
+| **生产部署（长远）** | **Linux 服务器 + Web 版** | 与 Windows 开发用同一套代码 |
+
+> 底层代码已用 `pathlib` 处理路径、Flask 提供 Web 界面，Windows 开发 → Linux 部署**无需改业务代码**，只需复制 `.env` 和 `data/` 目录。
 
 ## 功能
 
@@ -102,6 +113,67 @@ python3 web_main.py
 LLM_INSECURE_SSL=1 python3 web_main.py
 ```
 
+LLM_INSECURE_SSL=1 python3 web_main.py
+```
+
+## Windows 本地运行
+
+**不需要 Linux 虚拟机。** 安装 [Python 3.10+](https://www.python.org/downloads/)（勾选 *Add Python to PATH*）后：
+
+```powershell
+cd Rei-Cai
+git clone https://github.com/Vincentssssssss/Rei-Cai.git
+cd Rei-Cai
+
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+copy .env.example .env
+# 用记事本编辑 .env，填入 OPENAI_API_KEY 和 OPENAI_BASE_URL
+notepad .env
+
+python check_llm.py
+python web_main.py
+```
+
+浏览器打开 http://localhost:8000
+
+或双击运行（需先装好 Python）：
+
+```text
+scripts\run_web.bat
+```
+
+桌面 GUI（可选）：
+
+```powershell
+python main.py
+```
+
+## Linux 服务器部署（长远）
+
+开发与测试在 Windows 完成后，上 Linux 服务器只需：
+
+```bash
+# 服务器上
+git clone https://github.com/Vincentssssssss/Rei-Cai.git
+cd Rei-Cai
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+cp .env.example .env   # 填入与本地相同的配置
+python3 check_llm.py
+python3 web_main.py    # 或配合 systemd / Docker 后台运行
+```
+
+生产环境建议：
+- 使用 `web_main.py`（与 Windows 开发相同入口）
+- 前面加 Nginx 反向代理
+- 用 systemd 或 Docker 保持进程常驻
+- `data/knowledge/` 和 `data/index/` 持久化挂载
+
 ## 本地 Linux 桌面运行
 
 ### 环境要求
@@ -161,9 +233,14 @@ python3 web_main.py
 ## 项目结构
 
 ```
-├── main.py                 # 桌面 GUI 入口
-├── web_main.py             # Web 入口（Codespaces）
+├── main.py                 # 桌面 GUI（Windows/macOS/Linux）
+├── web_main.py             # Web 入口（全平台，推荐）
+├── check_llm.py            # API 连接诊断
 ├── requirements.txt
+├── scripts/
+│   ├── run_web.sh          # Linux/macOS 一键启动
+│   ├── run_web.bat         # Windows 一键启动
+│   └── setup_env.sh
 ├── .devcontainer/          # Codespaces 配置
 ├── data/
 │   ├── knowledge/          # 上传的资料文件
