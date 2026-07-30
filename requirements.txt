@@ -6,3 +6,6 @@ requests>=2.31.0
 certifi>=2024.0.0
 truststore>=0.10.0
 python-dotenv>=1.0.0
+langgraph>=0.2.39
+langchain-core>=0.3.0
+pytest>=8.3.0

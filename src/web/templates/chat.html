@@ -61,7 +61,10 @@
 
         const source = document.createElement("div");
         source.className = "citation-title";
-        source.textContent = `[${index + 1}] ${item.source}`;
+        const version = item.doc_version ? `, ${item.doc_version}` : "";
+        const section = item.section_hint ? `, ${item.section_hint}` : "";
+        const page = item.page_hint ? `, page ${item.page_hint}` : "";
+        source.textContent = `[${index + 1}] ${item.source}${version}${section}${page}`;
         li.appendChild(source);
 
         const excerpt = document.createElement("div");
