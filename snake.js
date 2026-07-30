@@ -18,6 +18,7 @@ let nextDirection = { x: 1, y: 0 };
 let score = 0;
 let highScore = 0;
 let isGameOver = false;
+let isPaused = false;
 let tickMs = INITIAL_SPEED_MS;
 let loopTimer = null;
 
@@ -75,6 +76,7 @@ function startGame() {
   score = 0;
   tickMs = INITIAL_SPEED_MS;
   isGameOver = false;
+  isPaused = false;
   spawnFood();
   updateScoreboard();
   draw();
@@ -91,15 +93,44 @@ function handleDirectionKey(inputDirection) {
   }
 }
 
+function togglePause() {
+  if (isGameOver) {
+    return;
+  }
+
+  isPaused = !isPaused;
+  if (isPaused) {
+    clearLoop();
+  } else {
+    startLoop();
+  }
+  draw();
+}
+
 function handleKeyDown(event) {
   const key = event.key.toLowerCase();
 
-  if (key === " " || key === "arrowup" || key === "arrowdown" || key === "arrowleft" || key === "arrowright") {
+  if (
+    key === " " ||
+    key === "arrowup" ||
+    key === "arrowdown" ||
+    key === "arrowleft" ||
+    key === "arrowright"
+  ) {
     event.preventDefault();
   }
 
   if (isGameOver && key === " ") {
     startGame();
+    return;
+  }
+
+  if (key === "p") {
+    togglePause();
+    return;
+  }
+
+  if (isPaused) {
     return;
   }
 
@@ -218,6 +249,18 @@ function draw() {
   drawGrid();
   drawFood();
   drawSnake();
+
+  if (isPaused) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#f2f5ff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = 'bold 30px "Segoe UI", sans-serif';
+    ctx.fillText("已暂停", canvas.width / 2, canvas.height / 2 - 8);
+    ctx.font = '16px "Segoe UI", sans-serif';
+    ctx.fillText("按 P 继续", canvas.width / 2, canvas.height / 2 + 24);
+  }
 }
 
 document.addEventListener("keydown", handleKeyDown);
