@@ -3,13 +3,12 @@ from pathlib import Path
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
-from src.chat.citations import build_citations
-from src.chat.engine import ChatEngine
 from src.config import KNOWLEDGE_DIR, SUPPORTED_EXTENSIONS, get_llm_status
 from src.knowledge.store import KnowledgeStore
+from src.travel_agent.runtime.service import TravelAssistantService
 
 store = KnowledgeStore()
-engine = ChatEngine(store)
+travel_assistant = TravelAssistantService(store)
 
 
 def create_app() -> Flask:
@@ -73,7 +72,8 @@ def create_app() -> Flask:
         if not question:
             return jsonify({"error": "问题不能为空"}), 400
 
-        answer, hits = engine.answer(question)
-        return jsonify({"answer": answer, "citations": build_citations(hits)})
+        payload = travel_assistant.ask(question)
+        # Keep backward-compatible shape while exposing new handoff metadata.
+        return jsonify(payload)
 
     return app

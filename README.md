@@ -252,3 +252,14 @@ python3 web_main.py
     ├── gui/                # 桌面图形界面
     └── web/                # Web 界面
 ```
+
+## Travel Assistant (LangGraph MVP)
+
+本仓库已增加基于 LangGraph 的差旅问答 MVP（大中华区范围）。
+
+- 统一运行时：`src/travel_agent/runtime/service.py`
+- 图定义：`src/travel_agent/graph/`
+- CLI 入口：`python scripts/travel_cli.py`
+- Web 入口：`python web_main.py`，聊天接口 `/api/chat`
+
+CLI 与 Web 共用同一套图逻辑，保证相同问题的业务结论一致。
