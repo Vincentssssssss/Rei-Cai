@@ -172,9 +172,6 @@ def compose_answer(state: dict) -> dict:
 
     hits = state.get("retrieved_chunks", [])
     intent = state.get("intent", "other")
-    llm_answer = _answer_with_llm(state["question"], hits)
-    if llm_answer:
-        return {"answer": llm_answer, "confidence": 0.8}
 
     if _contains_breakfast_not_cover(hits):
         return {
@@ -214,6 +211,12 @@ def compose_answer(state: dict) -> dict:
             ),
             "confidence": 0.2,
         }
+
+    # Keep policy decisions deterministic so local LLM configuration does not
+    # bypass the "precise answer or explicit handoff" requirement.
+    llm_answer = _answer_with_llm(state["question"], hits)
+    if llm_answer:
+        return {"answer": llm_answer, "confidence": 0.8}
 
     if intent == "contact":
         return {
