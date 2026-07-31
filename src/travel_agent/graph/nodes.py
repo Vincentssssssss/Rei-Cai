@@ -1,4 +1,6 @@
 from src.chat.citations import build_citations
+from src.config import get_llm_settings, get_travel_agent_system_prompt
+from src.http_client import create_http_session
 
 ESCALATION_EMAILS = "su.vincent@bcg.com / Zhang.Zhen@bcg.com"
 ESCALATION_MESSAGE = f"如需人工支持，请联系 {ESCALATION_EMAILS}。"
@@ -81,12 +83,68 @@ def _contains_breakfast_not_cover(hits: list[dict]) -> bool:
     return False
 
 
+def _answer_with_llm(question: str, hits: list[dict]) -> str | None:
+    settings = get_llm_settings()
+    api_key = settings.get("api_key", "")
+    base_url = settings.get("base_url", "")
+    model = settings.get("model", "")
+    if not api_key or not base_url or not model:
+        return None
+
+    context_blocks: list[str] = []
+    for item in hits:
+        context_blocks.append(
+            (
+                f"[source={item.get('source')}, version={item.get('doc_version')}, "
+                f"section={item.get('section_hint')}, page={item.get('page_hint')}]\n"
+                f"{item.get('text', '')}"
+            )
+        )
+    context = "\n\n".join(context_blocks)
+
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": get_travel_agent_system_prompt()},
+            {
+                "role": "user",
+                "content": (
+                    f"问题：{question}\n\n"
+                    f"资料片段（仅可基于这些资料回答）：\n{context}\n\n"
+                    "如果资料不足，请明确说无法确认并建议联系人工支持邮箱。"
+                ),
+            },
+        ],
+        "temperature": 0.1,
+    }
+
+    try:
+        session = create_http_session()
+        response = session.post(
+            f"{base_url}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=60,
+        )
+        response.raise_for_status()
+        content = response.json()["choices"][0]["message"]["content"].strip()
+        return content or None
+    except Exception:
+        return None
+
+
 def compose_answer(state: dict) -> dict:
     if state.get("handoff_required"):
         return {}
 
     hits = state.get("retrieved_chunks", [])
     intent = state.get("intent", "other")
+    llm_answer = _answer_with_llm(state["question"], hits)
+    if llm_answer:
+        return {"answer": llm_answer, "confidence": 0.8}
 
     if _contains_breakfast_not_cover(hits):
         return {

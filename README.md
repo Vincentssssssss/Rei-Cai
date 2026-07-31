@@ -263,3 +263,14 @@ python3 web_main.py
 - Web 入口：`python web_main.py`，聊天接口 `/api/chat`
 
 CLI 与 Web 共用同一套图逻辑，保证相同问题的业务结论一致。
+
+### 配置 System Prompt（用于测试）
+
+可通过环境变量覆盖默认 system prompt：
+
+```bash
+export TRAVEL_AGENT_SYSTEM_PROMPT="你是公司差旅助手。回答必须先结论，再依据，再下一步；知识不足时明确无法确认并转人工。"
+python3 web_main.py
+```
+
+未设置时将使用 `src/config.py` 中的 `TRAVEL_AGENT_DEFAULT_SYSTEM_PROMPT`。

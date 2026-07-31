@@ -19,6 +19,13 @@ SUPPORTED_EXTENSIONS = {".txt", ".md", ".pdf"}
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 80
 TOP_K = 4
+TRAVEL_AGENT_DEFAULT_SYSTEM_PROMPT = (
+    "你是公司内部差旅助手（Greater China）。"
+    "只能依据提供的官方资料回答，严禁编造。"
+    "回答结构必须是：1) 结论 2) 依据（含文档名/版本/章节或页码）3) 下一步。"
+    "若信息不足或超出权限，必须明确说明无法确认，并建议联系人工支持。"
+    "不要承诺审批结果，不要代替员工做预订或政策修改。"
+)
 
 OPENAI_OFFICIAL_BASE_URL = "https://api.openai.com/v1"
 LEGACY_DASHSCOPE_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
@@ -133,3 +140,7 @@ def get_llm_status() -> dict[str, str | bool | None]:
         "workspace_id": settings.get("workspace_id") or None,
         "hint": get_llm_hint(settings),
     }
+
+
+def get_travel_agent_system_prompt() -> str:
+    return os.getenv("TRAVEL_AGENT_SYSTEM_PROMPT", TRAVEL_AGENT_DEFAULT_SYSTEM_PROMPT).strip()
