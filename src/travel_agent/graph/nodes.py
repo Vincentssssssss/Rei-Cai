@@ -83,6 +83,36 @@ def _contains_breakfast_not_cover(hits: list[dict]) -> bool:
     return False
 
 
+def _extract_policy_conclusion(hits: list[dict]) -> tuple[str | None, str]:
+    if not hits:
+        return None, ""
+
+    top_text = str(hits[0].get("text", "")).strip()
+    text = top_text.lower()
+    deny_markers = (
+        "not cover",
+        "not reimbursable",
+        "not allowed",
+        "不可报销",
+        "不报销",
+        "不允许",
+    )
+    allow_markers = (
+        "reimbursed",
+        "reimbursable",
+        "allowed",
+        "可报销",
+        "可以报销",
+        "允许",
+    )
+
+    if any(marker in text for marker in deny_markers):
+        return "deny", top_text
+    if any(marker in text for marker in allow_markers):
+        return "allow", top_text
+    return None, top_text
+
+
 def _answer_with_llm(question: str, hits: list[dict]) -> str | None:
     settings = get_llm_settings()
     api_key = settings.get("api_key", "")
@@ -151,9 +181,38 @@ def compose_answer(state: dict) -> dict:
             "answer": (
                 "结论：不可以，酒店早餐不可报销。\n"
                 "依据：政策中 Meal 条款将 Breakfast 列为 Not cover（不报销）。\n"
-                "下一步：如为特殊场景，请先按例外审批流程申请；无法确认时转人工支持。"
+                f"下一步：如为特殊场景，请先按例外审批流程申请；需要人工确认请联系 {ESCALATION_EMAILS}。"
             ),
             "confidence": 0.95,
+        }
+
+    if intent == "policy":
+        conclusion, evidence = _extract_policy_conclusion(hits)
+        if conclusion == "deny":
+            return {
+                "answer": (
+                    "结论：不可以（或不在报销范围）。\n"
+                    f"依据：命中政策片段为「{evidence[:180]}」。\n"
+                    f"下一步：如你认为属于例外场景，请按审批流程申请，并联系 {ESCALATION_EMAILS}。"
+                ),
+                "confidence": 0.88,
+            }
+        if conclusion == "allow":
+            return {
+                "answer": (
+                    "结论：可以，但需按政策条件和单据要求执行。\n"
+                    f"依据：命中政策片段为「{evidence[:180]}」。\n"
+                    f"下一步：请按标准流程提交；如涉及边界或例外，请联系 {ESCALATION_EMAILS}。"
+                ),
+                "confidence": 0.82,
+            }
+        return {
+            "answer": (
+                "结论：当前无法给出精确政策结论。\n"
+                f"依据：已检索到相关片段，但不足以直接回答你的问题（示例片段：{evidence[:160]}）。\n"
+                f"下一步：请联系人工支持进一步确认：{ESCALATION_EMAILS}。"
+            ),
+            "confidence": 0.2,
         }
 
     if intent == "contact":
@@ -167,11 +226,11 @@ def compose_answer(state: dict) -> dict:
 
     return {
         "answer": (
-            "结论：请以以下引用的官方资料为准。\n"
-            "依据：已检索到相关政策片段，详见引用。\n"
-            "下一步：如涉及特殊审批，请先走审批流程并联系人工支持确认。"
+            "结论：当前无法给出精确答复。\n"
+            "依据：已检索到相关资料，但未形成可直接执行的明确结论。\n"
+            f"下一步：请联系人工支持确认：{ESCALATION_EMAILS}。"
         ),
-        "confidence": 0.65,
+        "confidence": 0.2,
     }
 
 
