@@ -112,10 +112,10 @@
   });
 
   questionInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && event.ctrlKey) {
-      event.preventDefault();
-      form.requestSubmit();
-    }
+    if (event.key !== "Enter") return;
+    if (event.shiftKey) return; // Shift+Enter 保留换行
+    event.preventDefault();
+    form.requestSubmit();
   });
 </script>
 {% endblock %}
